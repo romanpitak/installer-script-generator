@@ -1,3 +1,6 @@
+
+# ## Various trap callbacks
+
 trap-INT-callback() {
     echo "INT signal received"
     cleanup
@@ -7,6 +10,8 @@ trap-TERM-callback() {
     echo "TERM signal received"
     cleanup
 }
+
+# ### EXIT callback
 
 trap-EXIT-callback() {
     if test 0 -eq $?; then
