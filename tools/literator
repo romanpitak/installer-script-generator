@@ -1,0 +1,54 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+  # set the default stream position
+  streamPosition = "BEGIN";
+}
+
+/^$/ {
+    # empty lines reset blocks
+    streamPosition = "UNKNOWN";
+    print;
+    next;
+}
+
+/^\s+$/ { # TODO
+    print;
+    next;
+}
+
+# shebang line
+/^#!/ && ( streamPosition == "BEGIN" ) {
+    streamPosition = "UNKNOWN"
+    print "\n    " $0 "\n"
+    next
+}
+
+# Start the COMMENT block
+/^\s*#/ &&  ( streamPosition == "UNKNOWN" ) {
+    streamPosition = "COMMENT";
+}
+
+# Start the CODE block
+# whenever you find code
+/^\s*[^#]/ {
+    if ( streamPosition == "COMMENT" ) {
+        print ""
+    }
+    streamPosition = "CODE";
+}
+
+########## PRINTING
+
+# Print comments if in comment block
+/^\s*#/ && ( streamPosition == "COMMENT" ) {
+    sub(/^\s*# ?/, "")
+    print # TODO remove comment
+    next # goto next line
+}
+
+# Print code if in CODE block
+( streamPosition == "CODE" ) {
+    print "    " $0;
+    next; # goto next line
+}
